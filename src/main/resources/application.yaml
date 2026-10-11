@@ -1,0 +1,28 @@
+spring:
+  application:
+    name: autogestao-backend
+  datasource:
+    url: jdbc:postgresql://${AUTOGESTAO_DB_HOST:127.0.0.1}:${AUTOGESTAO_DB_PORT:5433}/${AUTOGESTAO_DB_NAME:Oficina_Felipe}?currentSchema=autogestao
+    username: ${AUTOGESTAO_DB_USER:postgres}
+    password: ${AUTOGESTAO_DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 5
+      minimum-idle: 1
+      connection-timeout: 10000
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+  flyway:
+    enabled: ${AUTOGESTAO_FLYWAY_ENABLED:true}
+    schemas: autogestao
+    default-schema: autogestao
+    baseline-on-migrate: false
+    clean-disabled: true
+server:
+  address: 127.0.0.1
