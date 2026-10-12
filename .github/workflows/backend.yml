@@ -1,0 +1,90 @@
+name: AutoGestao - Testar Backend
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+    branches: [master, main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: autogestao_ci
+          # Autenticacao sem senha apenas neste container descartavel de CI.
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports:
+          - 127.0.0.1:5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d autogestao_ci"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      AUTOGESTAO_DB_HOST: 127.0.0.1
+      AUTOGESTAO_DB_PORT: '5432'
+      AUTOGESTAO_DB_NAME: autogestao_ci
+      AUTOGESTAO_DB_PASSWORD: ''
+      AUTOGESTAO_TEST_DB_URL: jdbc:postgresql://127.0.0.1:5432/autogestao_migration_test
+
+    steps:
+      - name: Baixar codigo
+        uses: actions/checkout@v4
+
+      - name: Localizar backend e Maven Wrapper
+        id: backend
+        shell: bash
+        run: |
+          mapfile -t wrappers < <(find . -type f -name mvnw -not -path '*/target/*' -not -path '*/.git/*' | sort)
+          candidates=()
+          for wrapper in "${wrappers[@]}"; do
+            directory="$(dirname "$wrapper")"
+            if [[ -f "$directory/pom.xml" ]] && grep -q 'spring-boot' "$directory/pom.xml"; then
+              candidates+=("$directory")
+            fi
+          done
+          if [[ ${#candidates[@]} -ne 1 ]]; then
+            echo '::error::Esperado exatamente um backend Spring Boot com pom.xml e mvnw.'
+            exit 1
+          fi
+          echo "directory=${candidates[0]}" >> "$GITHUB_OUTPUT"
+          echo "pom=${candidates[0]}/pom.xml" >> "$GITHUB_OUTPUT"
+          chmod +x "${candidates[0]}/mvnw"
+
+      - name: Configurar Java 21 e cache Maven
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+          cache-dependency-path: ${{ steps.backend.outputs.pom }}
+
+      - name: Criar banco isolado dos testes de repositories
+        run: docker exec "${{ job.services.postgres.id }}" createdb -U postgres autogestao_migration_test
+
+      - name: Verificar Java e Maven
+        working-directory: ${{ steps.backend.outputs.directory }}
+        run: ./mvnw --version
+
+      - name: Compilar, testar e empacotar backend
+        working-directory: ${{ steps.backend.outputs.directory }}
+        run: ./mvnw --batch-mode --no-transfer-progress --errors clean verify
+
+      - name: Salvar relatorios de testes
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-test-reports
+          path: |
+            **/target/surefire-reports/**
+            **/target/failsafe-reports/**
+          if-no-files-found: ignore
+          retention-days: 7
