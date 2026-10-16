@@ -1,0 +1,10 @@
+{
+  "name": "autogestao-local-frontend",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/serve.mjs",
+    "test": "node --test src/services/api.test.mjs src/lib/*.test.mjs scripts/*.test.mjs"
+  },
+  "engines": { "node": ">=22" }
+}
