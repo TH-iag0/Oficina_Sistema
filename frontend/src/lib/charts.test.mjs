@@ -4,6 +4,32 @@ import { modoGrafico, salvarModoGrafico, graficoMarkup, selecionarGrafico } from
 import { axisMax, smoothPath, lineLabelLayout } from './chart-geometry.js';
 import { demonstracao } from './demo.js';
 import { estrutura } from '../views.js';
+import { FinanceCharts } from './financial-charts.js';
+
+test('linhas financeiras agrupam cada série sem perder pontos ou rótulos interativos', t => {
+    const documentoAnterior = globalThis.document, observerAnterior = globalThis.ResizeObserver;
+    class Elemento {
+        constructor(tag) { this.tag = tag; this.atributos = {}; this.children = []; }
+        setAttribute(nome, valor) { this.atributos[nome] = valor; }
+        append(...nodes) { this.children.push(...nodes); }
+        replaceChildren() { this.children = []; }
+    }
+    globalThis.document = { createElementNS: (_, tag) => new Elemento(tag) };
+    globalThis.ResizeObserver = class { observe() {} disconnect() {} };
+    t.after(() => { globalThis.document = documentoAnterior; globalThis.ResizeObserver = observerAnterior; });
+    const container = new Elemento('div'); container.clientWidth = 600;
+    const dados = [{ mes: '2026-09', entradas: 100, saidas: 20 }, { mes: '2026-10', entradas: 200, saidas: 40 }];
+    FinanceCharts.cashflow(container, dados);
+    const series = container.children[0].children.filter(node => node.atributos.class === 'financial-series');
+    assert.equal(series.length, 3);
+    for (const serie of series) {
+        assert.ok(serie.atributos['aria-label']);
+        const pontos = serie.children.filter(node => node.atributos.class === 'financial-point');
+        assert.equal(pontos.length, 2);
+        assert.ok(pontos.every(ponto => ponto.atributos.role === 'button' && ponto.atributos.tabindex === 0));
+    }
+    FinanceCharts.destroy(container);
+});
 
 test('seleção por clique e teclado mantém indicação acessível e Escape limpa o destaque', () => {
     const classes = new Set(), atributos = new Map([['aria-label', 'Agosto: R$ 23.450,00']]);

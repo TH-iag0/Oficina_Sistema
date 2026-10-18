@@ -1,7 +1,5 @@
 package br.com.example.autogestao_backend.model;
 
-import java.util.UUID;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -10,6 +8,7 @@ import jakarta.persistence.UniqueConstraint;
 import jakarta.persistence.Version;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import java.util.UUID;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -64,8 +63,13 @@ public class Funcionario {
         this.pinHash = validarHash(pinHash);
     }
 
-    public void ativar() { this.ativo = true; }
-    public void desativar() { this.ativo = false; }
+    public void ativar() {
+        this.ativo = true;
+    }
+
+    public void desativar() {
+        this.ativo = false;
+    }
 
     private static String textoObrigatorio(String valor, int limite, String campo) {
         if (valor == null || valor.isBlank() || valor.strip().length() > limite) {
@@ -81,11 +85,27 @@ public class Funcionario {
         return hash;
     }
 
-    public UUID getId() { return id; }
-    public String getNome() { return nome; }
-    public String getMatricula() { return matricula; }
+    public UUID getId() {
+        return id;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public String getMatricula() {
+        return matricula;
+    }
     // Não segue o padrão de getter para evitar exposição automática em respostas JSON.
-    public String pinHashParaAutenticacao() { return pinHash; }
-    public boolean isAtivo() { return ativo; }
-    public long getVersao() { return versao; }
+    public String pinHashParaAutenticacao() {
+        return pinHash;
+    }
+
+    public boolean isAtivo() {
+        return ativo;
+    }
+
+    public long getVersao() {
+        return versao;
+    }
 }

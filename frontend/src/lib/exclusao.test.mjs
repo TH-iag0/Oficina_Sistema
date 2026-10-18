@@ -18,9 +18,9 @@ test('exclusão utiliza a rota definitiva correta e CSRF nos três cadastros', a
         return url.endsWith('/csrf') ? { ok: true, status: 200, json: async () => ({ headerName: 'X-CSRF-TOKEN', token: 'teste' }) }
             : { ok: true, status: 204 };
     } });
-    for (const tipo of ['cliente', 'veiculo', 'servico']) await executarExclusao(api, tipo, 'abc');
+    for (const tipo of ['cliente', 'veiculo', 'servico', 'funcionario']) await executarExclusao(api, tipo, 'abc');
     const exclusoes = chamadas.filter(c => c.method === 'DELETE');
-    assert.deepEqual(exclusoes.map(c => new URL(c.url).pathname), ['/api/clientes/abc/exclusao', '/api/veiculos/abc/exclusao', '/api/servicos/abc/exclusao']);
+    assert.deepEqual(exclusoes.map(c => new URL(c.url).pathname), ['/api/clientes/abc/exclusao', '/api/veiculos/abc/exclusao', '/api/servicos/abc/exclusao', '/api/funcionarios/abc/exclusao']);
     assert.ok(exclusoes.every(c => c.headers['X-CSRF-TOKEN'] === 'teste' && c.credentials === 'include'));
     await assert.rejects(executarExclusao(api, 'invalido', 'abc'));
 });

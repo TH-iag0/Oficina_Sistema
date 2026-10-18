@@ -1,4 +1,4 @@
-import java.nio.file.Path;
+'import java.nio.file.Path;
 import org.flywaydb.core.Flyway;
 
 /** Executa somente migrations; a senha é recebida do ambiente do processo. */

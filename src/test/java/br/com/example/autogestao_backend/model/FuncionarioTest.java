@@ -5,7 +5,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 class FuncionarioTest {
@@ -34,8 +33,10 @@ class FuncionarioTest {
 
     @Test
     void rejeitaCamposAcimaDosLimitesSemAlterarNomeExistente() {
-        assertThrows(IllegalArgumentException.class, () -> new Funcionario("a".repeat(121), "OF-001", HASH));
-        assertThrows(IllegalArgumentException.class, () -> new Funcionario("João", "a".repeat(33), HASH));
+        var texto = "a".repeat(121);
+        assertThrows(IllegalArgumentException.class, () -> new Funcionario(texto, "OF-001", HASH));
+        var texto2 = "a".repeat(33);
+        assertThrows(IllegalArgumentException.class, () -> new Funcionario("João", texto2, HASH));
         var funcionario = new Funcionario("João", "OF-001", HASH);
         assertThrows(IllegalArgumentException.class, () -> funcionario.alterarNome(" "));
         assertEquals("João", funcionario.getNome());

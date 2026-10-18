@@ -64,7 +64,8 @@ test('financeiro 2D e 3D conserva as séries e escapa categorias vindas do servi
     assert.ok(plano.includes('data-chart="cashflow"'));
     assert.ok(plano.includes('data-chart="revenue"'));
     assert.ok(plano.includes('data-chart="donut"'));
-    assert.ok(!plano.includes('<img'));
+    assert.ok(!plano.includes('<img src=x'));
+    assert.ok(plano.includes('&lt;img src=x onerror=alert(1)&gt;'));
     assert.ok(plano.includes('data-form="despesa"'));
 });
 

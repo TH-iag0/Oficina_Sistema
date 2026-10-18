@@ -1,13 +1,16 @@
 package br.com.example.autogestao_backend.repository;
 
+import br.com.example.autogestao_backend.model.ExecucaoServico;
 import java.time.Instant;
 import java.util.UUID;
-import br.com.example.autogestao_backend.model.ExecucaoServico;
-import org.springframework.data.domain.*;
-import org.springframework.data.jpa.repository.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface ExecucaoServicoRepository extends JpaRepository<ExecucaoServico, UUID> {
+    boolean existsByItemOrdemServicoIdAndFimIsNull(UUID ordemServicoId);
     boolean existsByFuncionarioIdAndFimIsNull(UUID funcionarioId);
     boolean existsByItemIdAndFimIsNull(UUID itemId);
     Page<ExecucaoServico> findByItemId(UUID itemId, Pageable pageable);

@@ -15,10 +15,14 @@ final class RegrasModel {
         return valor == null || valor.isBlank() ? null : texto(valor, maximo, campo);
     }
     static BigDecimal dinheiro(BigDecimal valor) {
-        if (valor == null || valor.signum() < 0) throw new IllegalArgumentException("Valor não pode ser nulo ou negativo.");
+        if (valor == null || valor.signum() < 0) {
+            throw new IllegalArgumentException("Valor não pode ser nulo ou negativo.");
+        }
         try {
             BigDecimal resultado = valor.setScale(2, RoundingMode.UNNECESSARY);
-            if (resultado.precision() > 15) throw new IllegalArgumentException("Valor excede o limite monetário.");
+            if (resultado.precision() > 15) {
+                throw new IllegalArgumentException("Valor excede o limite monetário.");
+            }
             return resultado;
         } catch (ArithmeticException e) {
             throw new IllegalArgumentException("Valores monetários devem ter até duas casas decimais.", e);
@@ -26,10 +30,14 @@ final class RegrasModel {
     }
     static BigDecimal positivo(BigDecimal valor) {
         BigDecimal resultado = dinheiro(valor);
-        if (resultado.signum() == 0) throw new IllegalArgumentException("Valor deve ser maior que zero.");
+        if (resultado.signum() == 0) {
+            throw new IllegalArgumentException("Valor deve ser maior que zero.");
+        }
         return resultado;
     }
     static void cronologia(Instant anterior, Instant proximo) {
-        if (proximo == null || proximo.isBefore(anterior)) throw new IllegalArgumentException("Horário anterior ao último registro.");
+        if (proximo == null || proximo.isBefore(anterior)) {
+            throw new IllegalArgumentException("Horário anterior ao último registro.");
+        }
     }
 }

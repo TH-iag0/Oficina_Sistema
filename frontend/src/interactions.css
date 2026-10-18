@@ -1,0 +1,70 @@
+/* Interações adaptadas de monitor-theme.css e automations.css do projeto ONVIO. */
+input:not([type=checkbox]):not([type=radio]), select, textarea {
+    border-color:#2a4162;
+    background:linear-gradient(145deg,#172a44,#122038 72%);
+    box-shadow:inset 2px 3px 8px #030a1640,0 1px 2px #030a1620;
+    transition:border-color .25s ease,box-shadow .25s ease,background-color .25s ease;
+}
+input:not([type=checkbox]):not([type=radio]):focus, select:focus, textarea:focus {
+    outline:none;
+    border-color:#52749a;
+    background:#15263d;
+    box-shadow:0 0 0 1px #7aa7d012;
+}
+select:hover, select:open { border-color:#52749a; box-shadow:0 0 0 1px #7aa7d012; }
+.search-row { transition:width .25s ease; }
+.search-row:focus-within .search-icon { color:#9dcbff; }
+@supports (appearance:base-select) {
+    select::picker-icon { transition:rotate .2s ease; }
+    select::picker(select) {
+        border-color:#304966; border-radius:9px; background:#14243a;
+        box-shadow:0 14px 32px #030a1670;
+        max-height:min(290px,55vh); transform-origin:top center;
+    }
+    select:open::picker(select) { animation:onvio-options-in .18s cubic-bezier(.2,.8,.2,1) both; }
+    select option {
+        padding:9px 11px; border-radius:6px; background:transparent; color:#b8ccec;
+        opacity:1; transform:translateX(0);
+        transition:opacity .16s ease,transform .16s ease,background-color .16s ease,color .16s ease;
+    }
+    select option:is(:hover,:focus-visible,:checked) { background:#203d63; color:#dceaff; }
+    @media(hover:hover) {
+        select:open:has(option:hover) option:not(:hover) { opacity:.42; }
+        select:open option:hover { transform:translateX(4px); opacity:1; }
+    }
+    select option:focus-visible { outline:2px solid #70aaff; outline-offset:-2px; }
+}
+.button.primary {
+    position:relative; overflow:hidden;
+    border-color:#529dff; border-radius:9px;
+    background:linear-gradient(115deg,#174896 0%,#1768ce 58%,#1b64c5 100%);
+    box-shadow:0 5px 15px #0005;
+    transition:transform .18s ease,box-shadow .2s ease,filter .2s ease;
+}
+.button.primary:not(:disabled):hover { transform:translateY(-2px); filter:saturate(1.12); box-shadow:0 9px 20px #0007; }
+.button.primary:not(:disabled):active { transform:translateY(0) scale(.99); box-shadow:0 3px 8px #0005; }
+.button.primary:focus-visible { outline:3px solid #78aaff; outline-offset:3px; }
+.button.primary svg { transition:transform .2s ease; }
+.button.primary:not(:disabled):hover svg { transform:scale(1.08) rotate(-5deg); }
+form .button.primary.wide { min-height:46px; padding-left:48px; padding-right:48px; }
+form .button.primary.wide::before {
+    content:""; position:absolute; left:14px; width:25px; height:25px;
+    border:1px solid #ffffff48; border-radius:7px;
+    background:#ffffff1b url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 12 4 4 8-9'/%3E%3C/svg%3E") center/18px no-repeat;
+    transition:transform .2s ease,background-color .2s ease;
+}
+form .button.primary.wide:not(:disabled):hover::before { transform:scale(1.08) rotate(-5deg); background-color:#ffffff2c; }
+@keyframes onvio-options-in {
+    from { opacity:0; transform:translateY(-5px) scale(.98); }
+    to { opacity:1; transform:translateY(0) scale(1); }
+}
+@media(prefers-reduced-motion:reduce) {
+    input,select,textarea,.button.primary,.button.primary svg,form .button.primary.wide::before { transition:none!important; }
+    select::picker(select),select::picker-icon,select option { animation:none!important; transition:none!important; }
+    select:open option:hover,.button.primary:not(:disabled):hover,.button.primary:not(:disabled):active,
+    .button.primary:not(:disabled):hover svg,form .button.primary.wide:not(:disabled):hover::before { transform:none; }
+}
+@media(forced-colors:active) {
+    input:focus,select:focus,textarea:focus { outline:2px solid Highlight; }
+    select:open option { opacity:1!important; }
+}

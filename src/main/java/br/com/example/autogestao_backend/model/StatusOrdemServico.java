@@ -5,8 +5,12 @@ public enum StatusOrdemServico {
     EM_SERVICO, AGUARDANDO_PECA, FINALIZADO, ENTREGUE, CANCELADO;
 
     public boolean permite(StatusOrdemServico destino) {
-        if (destino == null) return false;
-        if (destino == CANCELADO) return this != FINALIZADO && this != ENTREGUE && this != CANCELADO;
+        if (destino == null) {
+            return false;
+        }
+        if (destino == CANCELADO) {
+            return this != FINALIZADO && this != ENTREGUE && this != CANCELADO;
+        }
         return switch (this) {
             case RASCUNHO -> destino == RECEBIDO;
             case RECEBIDO -> destino == DIAGNOSTICO;

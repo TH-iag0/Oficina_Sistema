@@ -1,24 +1,23 @@
 package br.com.example.autogestao_backend.model;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.ForeignKey;
+import jakarta.persistence.Id;
+import jakarta.persistence.Index;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Objects;
 import java.util.UUID;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Id;
-import jakarta.persistence.Index;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.ForeignKey;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -66,7 +65,9 @@ public class MarcacaoPonto {
                           Instant instante, ZoneId fuso) {
         this.id = UUID.randomUUID();
         this.funcionario = Objects.requireNonNull(funcionario, "Funcionário obrigatório.");
-        if (!funcionario.isAtivo()) throw new IllegalStateException("Funcionário inativo não pode registrar ponto.");
+        if (!funcionario.isAtivo()) {
+            throw new IllegalStateException("Funcionário inativo não pode registrar ponto.");
+        }
         this.tipo = Objects.requireNonNull(tipo, "Tipo de marcação obrigatório.");
         this.requisicaoId = Objects.requireNonNull(requisicaoId, "Identificador de confirmação obrigatório.");
         this.instante = Objects.requireNonNull(instante, "Horário obrigatório.");
@@ -80,11 +81,31 @@ public class MarcacaoPonto {
             Objects.requireNonNull(relogio, "Relógio obrigatório.").instant(), fuso);
     }
 
-    public UUID getId() { return id; }
-    public Funcionario getFuncionario() { return funcionario; }
-    public UUID getFuncionarioId() { return funcionario.getId(); }
-    public TipoMarcacao getTipo() { return tipo; }
-    public Instant getInstante() { return instante; }
-    public LocalDate getDataRegistro() { return dataRegistro; }
-    public UUID getRequisicaoId() { return requisicaoId; }
+    public UUID getId() {
+        return id;
+    }
+
+    public Funcionario getFuncionario() {
+        return funcionario;
+    }
+
+    public UUID getFuncionarioId() {
+        return funcionario.getId();
+    }
+
+    public TipoMarcacao getTipo() {
+        return tipo;
+    }
+
+    public Instant getInstante() {
+        return instante;
+    }
+
+    public LocalDate getDataRegistro() {
+        return dataRegistro;
+    }
+
+    public UUID getRequisicaoId() {
+        return requisicaoId;
+    }
 }

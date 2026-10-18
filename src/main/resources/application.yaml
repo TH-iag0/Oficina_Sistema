@@ -1,6 +1,13 @@
 spring:
+  security:
+    user:
+      name: ${AUTOGESTAO_ADMIN_USER:proprietario}
+      roles: ADMIN
   application:
     name: autogestao-backend
+  mvc:
+    problemdetails:
+      enabled: true
   datasource:
     url: jdbc:postgresql://${AUTOGESTAO_DB_HOST:127.0.0.1}:${AUTOGESTAO_DB_PORT:5433}/${AUTOGESTAO_DB_NAME:Oficina_Felipe}?currentSchema=autogestao
     username: ${AUTOGESTAO_DB_USER:postgres}
@@ -25,4 +32,9 @@ spring:
     baseline-on-migrate: false
     clean-disabled: true
 server:
+  forward-headers-strategy: NONE
   address: 127.0.0.1
+autogestao:
+  fuso: ${AUTOGESTAO_FUSO:America/Sao_Paulo}
+  cors:
+    allowed-origins: ${AUTOGESTAO_FRONTEND_ORIGINS:http://localhost:5173}

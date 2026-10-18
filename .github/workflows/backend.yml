@@ -68,7 +68,9 @@ jobs:
           cache-dependency-path: ${{ steps.backend.outputs.pom }}
 
       - name: Criar banco isolado dos testes de repositories
-        run: docker exec "${{ job.services.postgres.id }}" createdb -U postgres autogestao_migration_test
+        run: |
+          docker exec "${{ job.services.postgres.id }}" createdb -U postgres autogestao_migration_test
+          docker exec "${{ job.services.postgres.id }}" createdb -U postgres autogestao_migration_test_concurrency
 
       - name: Verificar Java e Maven
         working-directory: ${{ steps.backend.outputs.directory }}
@@ -77,6 +79,15 @@ jobs:
       - name: Compilar, testar e empacotar backend
         working-directory: ${{ steps.backend.outputs.directory }}
         run: ./mvnw --batch-mode --no-transfer-progress --errors clean verify
+
+      - name: Configurar Node para testar cliente da API
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Testar previa e cliente de acesso do front-end
+        working-directory: ${{ steps.backend.outputs.directory }}/frontend
+        run: npm test
 
       - name: Salvar relatorios de testes
         if: always()

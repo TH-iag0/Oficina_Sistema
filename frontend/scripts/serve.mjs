@@ -4,7 +4,7 @@ import { dirname, extname, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const types = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css' };
+const types = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.png': 'image/png' };
 
 export function arquivoPublico(url) {
     const path = decodeURIComponent(new URL(url, 'http://localhost').pathname);
@@ -27,7 +27,8 @@ export function servidor() {
             const file = arquivoPublico(request.url);
             if (!file) { response.writeHead(404).end(); return; }
             const content = await readFile(file);
-            response.writeHead(200, { 'Content-Type': types[extname(file)] + '; charset=utf-8' });
+            const type = types[extname(file)];
+            response.writeHead(200, { 'Content-Type': type + (type.startsWith('text/') ? '; charset=utf-8' : '') });
             response.end(request.method === 'HEAD' ? undefined : content);
         } catch {
             response.writeHead(404).end();

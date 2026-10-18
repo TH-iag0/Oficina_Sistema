@@ -35,19 +35,35 @@ test("cadastro local usa CSRF sem enviar login ou senha", async () => {
     assert.equal(chamadas[1].opcoes.headers.Authorization, undefined);
 });
 
-test("ponto publico omite credenciais administrativas e preserva requisicaoId", async () => {
+test("ponto publico usa CSRF e preserva requisicaoId sem enviar autorização administrativa", async () => {
     const chamadas = [];
     const api = criarApi({ usuario: "admin", senha: "senha-de-teste", fetchImpl: async (url, opcoes) => {
         chamadas.push({ url, opcoes });
-        return Response.json({ id: "marcacao" });
+        return Response.json(url.endsWith('/api/csrf')
+            ? { headerName: 'X-CSRF-TOKEN', token: 'token-ponto' } : { id: "marcacao" });
     }});
     const dados = { matricula: "OF-001", pin: "123456", tipo: "ENTRADA", requisicaoId: "pedido-original" };
     await api.registrarPonto(dados);
     await api.registrarPonto(dados);
-    assert.equal(chamadas.length, 2);
-    assert.equal(chamadas[0].opcoes.credentials, "omit");
-    assert.equal(chamadas[0].opcoes.headers.Authorization, undefined);
-    assert.equal(JSON.parse(chamadas[1].opcoes.body).requisicaoId, "pedido-original");
+    assert.equal(chamadas.length, 4);
+    for (const chamada of chamadas) {
+        assert.equal(chamada.opcoes.credentials, "include");
+        assert.equal(chamada.opcoes.headers.Authorization, undefined);
+    }
+    for (const chamada of [chamadas[1], chamadas[3]]) {
+        assert.equal(chamada.opcoes.headers['X-CSRF-TOKEN'], 'token-ponto');
+        assert.deepEqual(JSON.parse(chamada.opcoes.body), dados);
+    }
+});
+
+test('ponto não envia marcação quando a obtenção do CSRF falha', async () => {
+    const urls = [];
+    const api = criarApi({ fetchImpl: async url => {
+        urls.push(url);
+        return Response.json({ detail: 'CSRF indisponível.' }, { status: 503 });
+    }});
+    await assert.rejects(api.registrarPonto({ matricula: '001', pin: '123456' }), { message: 'CSRF indisponível.' });
+    assert.deepEqual(urls, ['http://localhost:8080/api/csrf']);
 });
 
 test("propaga Problem Details sem esconder status de validacao", async () => {
@@ -109,7 +125,7 @@ test("pagamentos e ajustes preservam a chave de idempotencia enviada pela tela",
 
 test('aplicação inicia conectada sem formulário de login', async () => {
     const app = await readFile(new URL('../app.js', import.meta.url), 'utf8');
-    assert.ok(app.includes('else conectar();'));
+    assert.match(app, /else\s*\{\s*await conectar\(\);\s*\}/);
     assert.ok(!app.includes('connection-form'));
     assert.ok(!app.includes('autocomplete="current-password"'));
 });

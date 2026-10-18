@@ -17,7 +17,7 @@ test('pesquisa espera a pausa na digitação e usa apenas o último termo', t =>
 });
 
 test('atualização preserva o texto, foco e posição do cursor', () => {
-    const form = { hasAttribute: () => false, dataset: { cadastroSearch: 'servico' } };
+    const form = { dataset: { cadastroSearch: 'servico' } };
     const antigo = { matches: () => true, closest: () => form, value: 'óleo novo', selectionStart: 4, selectionEnd: 4 };
     let foco = false, selecao;
     const novo = { value: '', focus() { foco = true; }, setSelectionRange(...args) { selecao = args; } };
@@ -28,6 +28,22 @@ test('atualização preserva o texto, foco e posição do cursor', () => {
     assert.equal(novo.value, 'óleo novo');
     assert.equal(foco, true);
     assert.deepEqual(selecao, [4, 4]);
+});
+
+test('pesquisa de ordens preserva cursor quando o atributo está vazio', () => {
+    const form = { dataset: { orderSearch: '' } };
+    const antigo = { matches: () => true, closest: () => form, value: '1048', selectionStart: 2, selectionEnd: 4 };
+    let seletor, selecao, foco = false;
+    const novo = { value: '', focus() { foco = true; }, setSelectionRange(...args) { selecao = args; } };
+    const root = {
+        ownerDocument: { activeElement: antigo }, contains: () => true,
+        querySelector(valor) { seletor = valor; return novo; }
+    };
+    redesenharPesquisa(root, () => {});
+    assert.equal(seletor, '[data-order-search] input[name=busca]');
+    assert.equal(novo.value, '1048');
+    assert.equal(foco, true);
+    assert.deepEqual(selecao, [2, 4]);
 });
 
 test('pesquisas de cadastros e ordens usam input com lupa sem botão pesquisar', () => {

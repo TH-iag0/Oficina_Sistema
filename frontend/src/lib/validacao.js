@@ -1,5 +1,10 @@
 export function valorMonetario(valor, campo = 'Valor') {
-    const texto = typeof valor === 'string' ? valor.trim() : typeof valor === 'number' ? String(valor) : '';
+  let texto = '';
+  if (typeof valor === 'string') {
+    texto = valor.trim();
+  } else if (typeof valor === 'number') {
+    texto = String(valor);
+  }
     const numero = Number(texto);
     if (!/^\d+(?:\.\d{1,2})?$/.test(texto) || !Number.isFinite(numero) || numero > 9999999999999.99) {
         throw new Error(`${campo}: informe um valor não negativo, com até duas casas decimais.`);

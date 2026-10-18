@@ -6,12 +6,10 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.UUID;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 class MarcacaoPontoTest {
@@ -20,14 +18,17 @@ class MarcacaoPontoTest {
     private static final Clock RELOGIO = Clock.fixed(INSTANTE, ZoneOffset.UTC);
     private static final String HASH = new BCryptPasswordEncoder(4).encode("123456");
 
-    private Funcionario funcionario() { return new Funcionario("João", "OF-001", HASH); }
+    private Funcionario funcionario() {
+        return new Funcionario("João", "OF-001", HASH);
+    }
 
     @Test
     void funcionarioInativoNaoPodeRegistrarPonto() {
         var funcionario = funcionario();
         funcionario.desativar();
+        var requisicaoId = UUID.randomUUID();
         assertThrows(IllegalStateException.class, () -> MarcacaoPonto.registrar(funcionario,
-            TipoMarcacao.ENTRADA, UUID.randomUUID(), RELOGIO, FUSO));
+            TipoMarcacao.ENTRADA, requisicaoId, RELOGIO, FUSO));
     }
 
     @ParameterizedTest

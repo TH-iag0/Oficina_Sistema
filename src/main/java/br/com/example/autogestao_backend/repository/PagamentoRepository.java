@@ -1,12 +1,16 @@
 package br.com.example.autogestao_backend.repository;
 
-import java.math.BigDecimal;
-import java.time.Instant;
-import java.util.*;
 import br.com.example.autogestao_backend.model.Pagamento;
 import jakarta.persistence.LockModeType;
-import org.springframework.data.domain.*;
-import org.springframework.data.jpa.repository.*;
+import java.math.BigDecimal;
+import java.time.Instant;
+import java.util.Optional;
+import java.util.UUID;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface PagamentoRepository extends JpaRepository<Pagamento, UUID> {
